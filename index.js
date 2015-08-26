@@ -12,6 +12,8 @@ function resx2JS(options) {
 	var stream = through2.obj(function(file, enc, callback) {
 		var content, document, children, childNode, outputObj = {};
 
+		var namespace = options.namespace || '';
+
 		if (file.isNull()) {
 			this.push(file);
 			return callback();
@@ -30,9 +32,12 @@ function resx2JS(options) {
 			outputObj[children[childNode].attr.name] = children[childNode].children[0].val;
 		}
 
-		file.path = rext(file.path, '.js');
-		console.log('Resource file generated: ' + file.path);
-		file.contents = new Buffer(JSON.stringify(outputObj));
+		file.path = file.base + (options.target || rext(file.path, '.js'));
+		console.log('Resource file generated: ' + file.base + (options.target || rext(file.path, '.js')));
+
+
+		var resourceJson = JSON.stringify(outputObj);
+		file.contents = new Buffer(namespace == '' ? resourceJson : "{ \"" + namespace + "\": {" + resourceJson + "}}");
 
 		this.push(file);
 		return callback();
