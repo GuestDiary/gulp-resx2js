@@ -37,7 +37,7 @@ function resx2JS(options) {
 
 
 		var resourceJson = JSON.stringify(outputObj);
-		file.contents = new Buffer(namespace == '' ? resourceJson : "{ \"" + namespace + "\": {" + resourceJson + "}}");
+		file.contents = new Buffer(namespace == '' ? resourceJson : "{ \"" + namespace + "\": " + resourceJson + "}");
 
 		this.push(file);
 		return callback();
