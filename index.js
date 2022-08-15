@@ -1,8 +1,7 @@
 var through2 = require('through2');
 var xmldoc = require('xmldoc');
-var gutil = require('gulp-util');
 var rext = require('replace-ext');
-var PluginError = gutil.PluginError;
+var PluginError = require('plugin-error');
 
 const PLUGIN_NAME = 'gulp-resx2js';
 
@@ -23,13 +22,13 @@ function resx2JS(options) {
 		files.push(file);
 	    return callback();
     }, function(callback) {
-		var content, children, childNode, outputObj = {}, namespace = options.namespace || '';
+		var outputObj = {}, namespace = options.namespace || '';
     	files.forEach(function(file) {
-			content = file.contents.toString('utf8');
-			var document = new xmldoc.XmlDocument(content);
-			children = document.childrenNamed('data');
-			for(childNode in children) {
-				outputObj[children[childNode].attr.name] = children[childNode].children[0].val;
+			var content = file.contents.toString('utf8');
+			var children = new xmldoc.XmlDocument(content).childrenNamed('data');
+			for(var childNode in children) {
+				var valueNode = children[childNode].children.find(function(child) { return child.name === 'value'; })
+				outputObj[children[childNode].attr.name] = valueNode.val;
 			}
     	});
 		var resourceJson = JSON.stringify(outputObj);
